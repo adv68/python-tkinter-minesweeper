@@ -9,6 +9,8 @@ import platform
 import time
 from datetime import time, date, datetime
 
+from agent import Agent
+
 SIZE_X = 10
 SIZE_Y = 10
 
@@ -61,6 +63,15 @@ class Minesweeper:
         self.correctFlagCount = 0
         self.clickedCount = 0
         self.startTime = None
+
+
+        # ADDED SECTION
+
+        self.gameEnded = False
+        self.won = False
+
+        # END ADDED SECTION
+
 
         # create buttons
         self.tiles = dict({})
@@ -124,6 +135,15 @@ class Minesweeper:
                     self.tiles[x][y]["button"].config(image = self.images["mine"])
 
         self.tk.update()
+
+
+        # ADDED SECTION
+
+        self.gameEnded = True
+        self.won = won
+
+        # END ADDED SECTION
+
 
         msg = "You Win! Play again?" if won else "You Lose! Play again?"
         res = tkMessageBox.askyesno("Game Over", msg)
@@ -239,6 +259,37 @@ class Minesweeper:
         tile["state"] = STATE_CLICKED
         self.clickedCount += 1
 
+    # SECTION ADDED FOR AGENT
+
+    # -1 doesnt exist
+    # 0 dont know
+    # 1-9 visible number
+    # 10 flagged as bomb
+    def getState(self, x, y):
+        try:
+            tile = self.tiles[x][y]
+            if tile["state"] == STATE_FLAGGED:
+                return 10
+            elif tile["state"] == STATE_CLICKED:
+                return tile["mines"]
+            else:
+                return 0
+        except KeyError:
+            return -1
+        #return self.tiles[x][y]
+
+    def clickTile(self, x, y):
+        t = self.tiles[x][y]
+        t["button"].configure(bg = "#444444")
+        self.onClick(t)
+
+    def flagTime(self, x, y):
+        t = self.tiles[x][y]
+        t["button"].configure(bg = "#444444")
+        self.onRightClick(t)
+
+    # END SECTION ADDED FOR AGENT
+
 ### END OF CLASSES ###
 
 def main():
@@ -248,6 +299,10 @@ def main():
     window.title("Minesweeper")
     # create game instance
     minesweeper = Minesweeper(window)
+
+    # setup agent
+    agent = Agent(minesweeper)
+
     # run event loop
     window.mainloop()
 
