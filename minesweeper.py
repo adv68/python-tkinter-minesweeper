@@ -261,8 +261,9 @@ class Minesweeper:
 
     # SECTION ADDED FOR AGENT
 
-    # -1 doesnt exist
-    # 0 dont know
+    # -2 doesnt exist
+    # -1 dont know
+    # 0 clear
     # 1-9 visible number
     # 10 flagged as bomb
     def getState(self, x, y):
@@ -273,9 +274,9 @@ class Minesweeper:
             elif tile["state"] == STATE_CLICKED:
                 return tile["mines"]
             else:
-                return 0
+                return -1
         except KeyError:
-            return -1
+            return -2
         #return self.tiles[x][y]
 
     def clickTile(self, x, y):
@@ -283,7 +284,7 @@ class Minesweeper:
         t["button"].configure(bg = "#444444")
         self.onClick(t)
 
-    def flagTime(self, x, y):
+    def flagTile(self, x, y):
         t = self.tiles[x][y]
         t["button"].configure(bg = "#444444")
         self.onRightClick(t)
