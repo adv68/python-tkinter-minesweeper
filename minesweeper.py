@@ -6,7 +6,7 @@ from tkinter import messagebox as tkMessageBox
 from collections import deque
 import random
 import platform
-import time
+import time as timesleep
 from datetime import time, date, datetime
 
 from agent import Agent
@@ -57,6 +57,7 @@ class Minesweeper:
         self.restart() # start game
         self.updateTimer() # init timer
 
+
     def setup(self):
         # create flag and clicked tile variables
         self.flagCount = 0
@@ -69,7 +70,6 @@ class Minesweeper:
 
         self.gameEnded = False
         self.won = False
-
         # END ADDED SECTION
 
 
@@ -142,15 +142,29 @@ class Minesweeper:
         self.gameEnded = True
         self.won = won
 
+        if self.stopHandler == None:
+            # ORIGINAL END OF GAME CODE
+            msg = "You Win! Play again?" if won else "You Lose! Play again?"
+            res = tkMessageBox.askyesno("Game Over", msg)
+            if res:
+                self.restart()
+            else:
+                self.tk.quit()
+            # END ORIGINAL END CODE
+        else:
+            if self.stopHandler(won):
+                self.tk.quit()
+            else:
+                self.restart()
         # END ADDED SECTION
 
 
-        msg = "You Win! Play again?" if won else "You Lose! Play again?"
-        res = tkMessageBox.askyesno("Game Over", msg)
-        if res:
-            self.restart()
-        else:
-            self.tk.quit()
+        #msg = "You Win! Play again?" if won else "You Lose! Play again?"
+        #res = tkMessageBox.askyesno("Game Over", msg)
+        #if res:
+        #    self.restart()
+        #else:
+        #    self.tk.quit()
 
     def updateTimer(self):
         ts = "00:00:00"
@@ -289,6 +303,8 @@ class Minesweeper:
         t["button"].configure(bg = "#444444")
         self.onRightClick(t)
 
+    def setStopHandler(self, handler):
+        self.stopHandler = handler
     # END SECTION ADDED FOR AGENT
 
 ### END OF CLASSES ###
@@ -306,6 +322,9 @@ def main():
 
     # run event loop
     window.mainloop()
+
+    # stop agent
+    agent.stopThread()
 
 if __name__ == "__main__":
     main()
