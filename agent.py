@@ -1,8 +1,9 @@
 import threading
 import time
 import random
+import csv
 
-NUM_GAMES = 100
+NUM_GAMES = 1000
 
 class Agent:
 
@@ -15,6 +16,8 @@ class Agent:
         self.gameEnded = False
 
         self.ms.setStopHandler(self.gameEndHandler)
+
+        self.csvFile = "output.csv"
 
         self.thread = threading.Thread(target=self.agentThread)
         self.thread.start()
@@ -37,90 +40,69 @@ class Agent:
     def agentThread(self):
         time.sleep(1)     
 
-        while self.stop == False:
-            cellActions = {}
-            randMove = False
+        with open(self.csvFile, 'a', newline='') as csvfile:
+            csvwriter = csv.writer(csvfile)
 
-            self.startRand = True
+            while self.stop == False:
+                cellActions = {}
+                randMove = False
 
-            while self.gameEnded == False:
-                if len(cellActions) == 0:
-                    for i in range(0, 10):
-                        for j in range(0, 10):
-                            act = self.logicAgentGetActions(self.getStateGrid(i, j), i, j)
-                            if act.count(1) > 0:
-                                cellActions[(i, j)] = act
+                self.startRand = True
+
+                while self.gameEnded == False:
                     if len(cellActions) == 0:
-                        randMove = True
+                        for i in range(0, 10):
+                            for j in range(0, 10):
+                                grid = self.getStateGrid(i, j)
+                                act = self.logicAgentGetActions(grid, i, j)
+                                if act.count(1) > 0:
+                                    cellActions[(i, j)] = act
 
-                if randMove:
-                    randX = random.randint(0, 9)
-                    randY = random.randint(0, 9)
+                                    # csv writer for for model builder data
+                                    row = []
+                                    for k in range(i - 2, i + 3):
+                                        row = row + list(grid[k].values())
+                                    row = row + list(act)
+                                    csvwriter.writerow(row) 
+                                    # end csv writer
 
-                    while (self.ms.getState(randX, randY) != -1):
+                        if len(cellActions) == 0:
+                            randMove = True
+
+                    if randMove:
                         randX = random.randint(0, 9)
                         randY = random.randint(0, 9)
 
-                    self.ms.clickTile(randX, randY)
+                        while (self.ms.getState(randX, randY) != -1):
+                            randX = random.randint(0, 9)
+                            randY = random.randint(0, 9)
 
-                    randMove = False
-                else:
-                    self.startRand = False
-                    for c, a in cellActions.items():
-                        if (a[0] == 1):
-                            self.ms.clickTile(c[0], c[1])
-                        elif (a[1] == 1):
-                            self.ms.flagTile(c[0], c[1])
+                        self.ms.clickTile(randX, randY)
 
-                        cellActions.pop(c)
-                        break
+                        randMove = False
+                    else:
+                        self.startRand = False
+                        for c, a in cellActions.items():
+                            if (a[0] == 1):
+                                self.ms.clickTile(c[0], c[1])
+                            elif (a[1] == 1):
+                                self.ms.flagTile(c[0], c[1])
+
+                            cellActions.pop(c)
+                            break
+                    
+                    # comment out if your are running simulations
+                    # use if you want to watch the game play
+                    #time.sleep(0.1)
                 
-                # comment out if your are running simulations
-                # use if you want to watch the game play
-                #time.sleep(0.1)
-            
-            time.sleep(0.5)
-            self.gameEnded = False
+                time.sleep(0.5)
+                self.gameEnded = False
 
         print("Played", self.gameCounter, "games")
         print("Played (adjusted)", self.adjustedGameCounter, "games")
         print("Won", self.winCounter, "games")
         print(self.winCounter / self.gameCounter, "Success rate")
         print(self.winCounter / self.adjustedGameCounter, "Adjusted success rate")
-
-        #p = self.getStateGrid(0,0)
-        #print("asdf")
-
-        '''
-        while self.ms.gameEnded == False:
-            for i in range(0, 10):
-                for j in range(0, 10):
-                    print(self.ms.getState(i, j))
-            
-            time.sleep(10)
-        '''
-        '''
-
-        while self.ms.gameEnded == False:
-            x = random.randint(0, 9)
-            y = random.randint(0, 9)
-
-            while (self.ms.getState(x, y)['state'] != 0):
-                x = random.randint(0, 9)
-                y = random.randint(0, 9)
-
-            #self.ms.onClick(self.ms.tiles[x][y])
-            self.ms.clickTile(x, y)
-
-            time.sleep(0.25)
-
-        print("Done")
-
-        #'''
-
-        #print(self.ms.getState(0, 0))
-        #self.ms.onClick(self.ms.tiles[0][0])
-        #print(self.ms.getState(0, 0))
 
     def getStateGrid(self, x, y):
         state = {}
@@ -155,8 +137,9 @@ class Agent:
             return (0, 1)
         elif vals.count(0) > 0:
             return (1, 0)
+        
         return (0, 0)
-
+    
     
     # surVal
     # 1 is bomb
