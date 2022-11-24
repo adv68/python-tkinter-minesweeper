@@ -67,7 +67,6 @@ class Minesweeper:
 
 
         # ADDED SECTION
-
         self.gameEnded = False
         self.won = False
         # END ADDED SECTION

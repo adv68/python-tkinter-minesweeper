@@ -2,8 +2,14 @@ import threading
 import time
 import random
 import csv
+from tensorflow import keras
+import numpy as np
+import pandas as pd
 
-NUM_GAMES = 1000
+
+
+# Number of games to simulate
+NUM_GAMES = 10
 
 class Agent:
 
@@ -19,6 +25,18 @@ class Agent:
 
         self.csvFile = "output.csv"
 
+        # START AGENT CONFIG FLAGS
+        
+        # Set to true to output moves to "output.csv"
+        self.outputCsv = False
+
+        # Used to configure action agent to use to make decisions
+        self.actionAgent = LogicAgentActionChooser()
+        #self.actionAgent = KerasANNAgentActionChooser()
+        self.actionAgent.setup()
+
+        # END AGENT CONFIG FLAGS
+
         self.thread = threading.Thread(target=self.agentThread)
         self.thread.start()
 
@@ -31,9 +49,9 @@ class Agent:
             self.adjustedGameCounter = self.adjustedGameCounter + 1
         if won:
             self.winCounter = self.winCounter + 1
-            print("Won")
+            print("Won  ", self.gameCounter)
         else:
-            print("Lost")
+            print("Lost ", self.gameCounter)
         self.gameEnded = True
         return self.gameCounter >= NUM_GAMES
 
@@ -54,17 +72,19 @@ class Agent:
                         for i in range(0, 10):
                             for j in range(0, 10):
                                 grid = self.getStateGrid(i, j)
-                                act = self.logicAgentGetActions(grid, i, j)
+                                #act = self.logicAgentGetActions(grid, i, j)
+                                act = self.actionAgent.getActions(grid, i, j)
                                 if act.count(1) > 0:
                                     cellActions[(i, j)] = act
 
-                                    # csv writer for for model builder data
+                                # csv writer for for model builder data
+                                if self.outputCsv:
                                     row = []
                                     for k in range(i - 2, i + 3):
                                         row = row + list(grid[k].values())
                                     row = row + list(act)
                                     csvwriter.writerow(row) 
-                                    # end csv writer
+                                # end csv writer
 
                         if len(cellActions) == 0:
                             randMove = True
@@ -139,8 +159,55 @@ class Agent:
             return (1, 0)
         
         return (0, 0)
-    
-    
+
+
+
+
+
+    def getSurrounding(x, y):
+        return [
+            (x,     y + 1),
+            (x + 1, y + 1),
+            (x + 1, y    ),
+            (x + 1, y - 1),
+            (x,     y - 1),
+            (x - 1, y - 1),
+            (x - 1, y    ),
+            (x - 1, y + 1)
+        ]
+
+
+class AgentActionChooser:
+    def setup(self):
+        pass
+
+    def getActions(self, grid, x, y):
+        return (0, 0)
+
+class LogicAgentActionChooser(AgentActionChooser):
+    def getActions(self, grid, x, y):
+        ownState = grid[x][y]
+        if (ownState != -1):
+            return (0, 0)
+
+        surroundingCells = Agent.getSurrounding(x, y)
+        visibleSurroundingCells = []
+        for cell in surroundingCells:
+            st = grid[cell[0]][cell[1]]
+            if st >= 0 and st <= 9:
+                visibleSurroundingCells.append(cell)
+
+        vals = []
+        for cell in visibleSurroundingCells:
+            vals.append(self.checkCell(grid, cell[0], cell[1]))
+
+        if vals.count(1) > 0:
+            return (0, 1)
+        elif vals.count(0) > 0:
+            return (1, 0)
+        
+        return (0, 0)
+
     # surVal
     # 1 is bomb
     # 0 safe
@@ -171,19 +238,35 @@ class Agent:
 
         return -1
 
+class KerasANNAgentActionChooser(AgentActionChooser):
+    def setup(self):
+        super().setup()
 
+        self.model = keras.models.load_model("keras_model")
 
+    def getActions(self, grid, x, y):
+        row = []
+        for i in range(x - 2, x + 3):
+            row = row + list(grid[i].values())
 
+        '''
+        rowListOfArrays = []
+        for i in row:
+            rowListOfArrays.append(np.asarray([i]))
 
-    def getSurrounding(x, y):
-        return [
-            (x,     y + 1),
-            (x + 1, y + 1),
-            (x + 1, y    ),
-            (x + 1, y - 1),
-            (x,     y - 1),
-            (x - 1, y - 1),
-            (x - 1, y    ),
-            (x - 1, y + 1)
-        ]
+        rowArray = np.asarray(rowListOfArrays)
+        '''
+        listOfLists = []
+        for i in row:
+            listOfLists.append([i])
 
+        rowdf = pd.DataFrame(listOfLists)
+
+        val = self.model.predict(
+            rowdf.iloc[:, 0 : 25].values,
+            batch_size=1    
+        )
+
+        print(val)
+        return val
+        #return super().getActions(grid, x, y)
