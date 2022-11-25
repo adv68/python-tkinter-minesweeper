@@ -9,7 +9,7 @@ import pandas as pd
 
 
 # Number of games to simulate
-NUM_GAMES = 10
+NUM_GAMES = 5
 
 class Agent:
 
@@ -31,8 +31,8 @@ class Agent:
         self.outputCsv = False
 
         # Used to configure action agent to use to make decisions
-        self.actionAgent = LogicAgentActionChooser()
-        #self.actionAgent = KerasANNAgentActionChooser()
+        #self.actionAgent = LogicAgentActionChooser()
+        self.actionAgent = KerasANNAgentActionChooser()
         self.actionAgent.setup()
 
         # END AGENT CONFIG FLAGS
@@ -79,11 +79,12 @@ class Agent:
 
                                 # csv writer for for model builder data
                                 if self.outputCsv:
-                                    row = []
-                                    for k in range(i - 2, i + 3):
-                                        row = row + list(grid[k].values())
-                                    row = row + list(act)
-                                    csvwriter.writerow(row) 
+                                    if act.count(1) > 0 or random.random() > 0.99:
+                                        row = []
+                                        for k in range(i - 2, i + 3):
+                                            row = row + list(grid[k].values())
+                                        row = row + list(act)
+                                        csvwriter.writerow(row) 
                                 # end csv writer
 
                         if len(cellActions) == 0:
@@ -242,31 +243,31 @@ class KerasANNAgentActionChooser(AgentActionChooser):
     def setup(self):
         super().setup()
 
-        self.model = keras.models.load_model("keras_model")
+        #self.model = keras.models.load_model("keras_model")
+        self.model = keras.models.load_model("keras_model5")
 
     def getActions(self, grid, x, y):
         row = []
         for i in range(x - 2, x + 3):
             row = row + list(grid[i].values())
 
-        '''
-        rowListOfArrays = []
-        for i in row:
-            rowListOfArrays.append(np.asarray([i]))
-
-        rowArray = np.asarray(rowListOfArrays)
-        '''
-        listOfLists = []
-        for i in row:
-            listOfLists.append([i])
-
-        rowdf = pd.DataFrame(listOfLists)
+        rowArray = np.asarray([np.asarray(row)])
+        rowdf = pd.DataFrame(rowArray)
 
         val = self.model.predict(
             rowdf.iloc[:, 0 : 25].values,
             batch_size=1    
         )
 
-        print(val)
-        return val
+        tup = (val[0][0], val[0][1])
+        tupAdjusted = (
+            0 if tup[0] < 0.6 else 1,
+            0 if tup[1] < 0.6 else 1
+        )
+
+        print(row)
+        print(tup)
+        print(tupAdjusted)
+
+        return tupAdjusted
         #return super().getActions(grid, x, y)
