@@ -6,10 +6,14 @@ from tensorflow import keras
 import numpy as np
 import pandas as pd
 
+import onnx
+from onnx2keras import onnx_to_keras
+
+import requests
 
 
 # Number of games to simulate
-NUM_GAMES = 5
+NUM_GAMES = 25
 
 class Agent:
 
@@ -32,7 +36,8 @@ class Agent:
 
         # Used to configure action agent to use to make decisions
         #self.actionAgent = LogicAgentActionChooser()
-        self.actionAgent = KerasANNAgentActionChooser()
+        #self.actionAgent = KerasANNAgentActionChooser()
+        self.actionAgent = MLNETAgentActionChooser()
         self.actionAgent.setup()
 
         # END AGENT CONFIG FLAGS
@@ -78,12 +83,18 @@ class Agent:
                                     cellActions[(i, j)] = act
 
                                 # csv writer for for model builder data
+                                actSingle = 0
+                                if act[0] == 1:
+                                    actSingle = 1
+                                elif act[1] == 1: 
+                                    actSingle = 2
                                 if self.outputCsv:
                                     if act.count(1) > 0 or random.random() > 0.99:
                                         row = []
                                         for k in range(i - 2, i + 3):
                                             row = row + list(grid[k].values())
-                                        row = row + list(act)
+                                        #row = row + list(act)
+                                        row.append(actSingle)
                                         csvwriter.writerow(row) 
                                 # end csv writer
 
@@ -260,6 +271,78 @@ class KerasANNAgentActionChooser(AgentActionChooser):
         )
 
         tup = (val[0][0], val[0][1])
+        tupAdjusted = (
+            0 if tup[0] < 0.6 else 1,
+            0 if tup[1] < 0.6 else 1
+        )
+
+        print(row)
+        print(tup)
+        print(tupAdjusted)
+
+        return tupAdjusted
+        #return super().getActions(grid, x, y)
+
+class MLNETAgentActionChooser(AgentActionChooser):
+    def setup(self):
+        super().setup()
+
+        self.url = "https://localhost:49723/predict"
+        '''
+        onnxmodel = onnx.load("modelonnx.onnx")
+
+        self.model = onnx_to_keras(onnxmodel, ["in-u2l2","in-u2l1","in-u2","in-u2r1","in-u2r2","in-u1l2","in-u1l1","in-u1","in-u1r1","in-u1r2","in-l2","in-l1","in-0","in-r1","in-r2","in-d1l2","in-d1l1","in-d1","in-d1r1","in-d1r2","in-d2l2","in-d2l1","in-d2","in-d2r1","in-d2r2"])
+        '''
+
+    def getActions(self, grid, x, y):
+        row = []
+        for i in range(x - 2, x + 3):
+            row = row + list(grid[i].values())
+
+        rowArray = np.asarray([np.asarray(row)])
+
+        '''
+        rowdf = pd.DataFrame(rowArray)
+
+        val = self.model.predict(
+            rowdf.iloc[:, 0 : 25].values,
+            batch_size=1    
+        )
+        '''
+
+        data = {
+            "in_u2l2": row[0],
+            "in_u2l1": row[1],
+            "in_u2": row[2],
+            "in_u2r1": row[3],
+            "in_u2r2": row[4],
+            "in_u1l2": row[5],
+            "in_u1l1": row[6],
+            "in_u1": row[7],
+            "in_u1r1": row[8],
+            "in_u1r2": row[9],
+            "in_l2": row[10],
+            "in_l1": row[11],
+            "in_0": row[12],
+            "in_r1": row[13],
+            "in_r2": row[14],
+            "in_d1l2": row[15],
+            "in_d1l1": row[16],
+            "in_d1": row[17],
+            "in_d1r1": row[18],
+            "in_d1r2": row[19],
+            "in_d2l2": row[20],
+            "in_d2l1": row[21],
+            "in_d2": row[22],
+            "in_d2r1": row[23],
+            "in_d2r2": row[24]
+        }
+
+        res = requests.post(self.url, json = data, verify=False)
+        resJson = res.json()
+        val = resJson["prediction"]
+
+        tup = (1 if val == 1 else 0, 1 if val == 2 else 0)
         tupAdjusted = (
             0 if tup[0] < 0.6 else 1,
             0 if tup[1] < 0.6 else 1

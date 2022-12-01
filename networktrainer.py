@@ -41,7 +41,7 @@ if __name__ == "__main__":
     #model.add(layers.Dense(2, activation="sigmoid"))
 
     # attempt 5 - 30 epochs
-    # result: failure
+    # result: ok
     model = keras.Sequential()
     model.add(layers.Dense(32, input_dim=25, activation="linear"))
     model.add(layers.Dense(256, kernel_initializer=initializers.RandomNormal(mean=0.0, stddev=0.5, seed=None), activation="relu"))
@@ -60,13 +60,24 @@ if __name__ == "__main__":
     #model.add(layers.Dense(64))
     #model.add(layers.Dense(2, activation="sigmoid"))
 
+    # attempt 7 - 250 epochs
+    # result: 
+    #model = keras.Sequential()
+    #model.add(layers.Dense(128, input_dim=25, activation="linear"))
+    #model.add(layers.Dense(256, kernel_initializer=initializers.RandomNormal(mean=0.0, stddev=0.5, seed=None), activation="relu"))
+    #model.add(layers.Dense(512, kernel_initializer=initializers.RandomNormal(mean=0.0, stddev=0.5, seed=None), activation="tanh"))
+    #model.add(layers.Dense(256, kernel_initializer=initializers.RandomNormal(mean=0.0, stddev=0.5, seed=None), activation="sigmoid"))
+    #model.add(layers.Dense(128, kernel_initializer=initializers.RandomNormal(mean=0.0, stddev=0.5, seed=None), activation="relu"))
+    #model.add(layers.Dense(2, activation="sigmoid"))
+
+
 
     model.compile(optimizer="adam", loss="mae", metrics=["accuracy"])
 
     losses = model.fit(
         x=td_in, 
         y=td_out,
-        epochs=500,
+        epochs=250,
         validation_split=0.1
     )
 
@@ -82,6 +93,8 @@ if __name__ == "__main__":
     model.save("keras_model5")
     # attempt 6
     #model.save("keras_model6")
+    # attempt 7
+    #model.save("keras_model7")
 
     print(losses.history["accuracy"])
 
