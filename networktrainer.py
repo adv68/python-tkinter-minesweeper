@@ -2,6 +2,12 @@ import pandas as pd
 from tensorflow import keras
 from keras import layers, initializers
 
+# network trainer
+# builds (or should I say attempts to build) a keras model from training data
+# basically it loads the data, we build a model and add layers, train it, validate it and save it
+# the 7 models in this file are some of the models we tried (we did make some variations on these that are not listed)
+# number 5 was the most successful
+
 if __name__ == "__main__":
     trainingdata = pd.read_csv("trainingdata.csv")
     trainingdata.head()
@@ -51,7 +57,7 @@ if __name__ == "__main__":
     model.add(layers.Dense(2, activation="sigmoid"))
 
     # attempt 6 - 30 epochs
-    # result:
+    # result: failure
     #model = keras.Sequential()
     #model.add(layers.Dense(64, input_dim=25))
     #model.add(layers.Dense(64))
@@ -61,7 +67,7 @@ if __name__ == "__main__":
     #model.add(layers.Dense(2, activation="sigmoid"))
 
     # attempt 7 - 250 epochs
-    # result: 
+    # result:  failure
     #model = keras.Sequential()
     #model.add(layers.Dense(128, input_dim=25, activation="linear"))
     #model.add(layers.Dense(256, kernel_initializer=initializers.RandomNormal(mean=0.0, stddev=0.5, seed=None), activation="relu"))

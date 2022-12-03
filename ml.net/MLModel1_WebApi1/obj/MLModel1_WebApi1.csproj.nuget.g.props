@@ -14,13 +14,18 @@
     <SourceRoot Include="C:\Program Files\dotnet\sdk\NuGetFallbackFolder\" />
   </ItemGroup>
   <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <Import Project="$(NuGetPackageRoot)microsoft.extensions.apidescription.server\3.0.0\build\Microsoft.Extensions.ApiDescription.Server.props" Condition="Exists('$(NuGetPackageRoot)microsoft.extensions.apidescription.server\3.0.0\build\Microsoft.Extensions.ApiDescription.Server.props')" />
-    <Import Project="$(NuGetPackageRoot)swashbuckle.aspnetcore\6.1.4\build\Swashbuckle.AspNetCore.props" Condition="Exists('$(NuGetPackageRoot)swashbuckle.aspnetcore\6.1.4\build\Swashbuckle.AspNetCore.props')" />
-    <Import Project="$(NuGetPackageRoot)microsoft.ml\1.6.0\build\netstandard2.0\Microsoft.ML.props" Condition="Exists('$(NuGetPackageRoot)microsoft.ml\1.6.0\build\netstandard2.0\Microsoft.ML.props')" />
+    <Import Project="$(NuGetPackageRoot)torchsharp\0.98.1\buildTransitive\net5.0\TorchSharp.props" Condition="Exists('$(NuGetPackageRoot)torchsharp\0.98.1\buildTransitive\net5.0\TorchSharp.props')" />
+    <Import Project="$(NuGetPackageRoot)microsoft.extensions.apidescription.server\6.0.5\build\Microsoft.Extensions.ApiDescription.Server.props" Condition="Exists('$(NuGetPackageRoot)microsoft.extensions.apidescription.server\6.0.5\build\Microsoft.Extensions.ApiDescription.Server.props')" />
+    <Import Project="$(NuGetPackageRoot)swashbuckle.aspnetcore\6.4.0\build\Swashbuckle.AspNetCore.props" Condition="Exists('$(NuGetPackageRoot)swashbuckle.aspnetcore\6.4.0\build\Swashbuckle.AspNetCore.props')" />
+    <Import Project="$(NuGetPackageRoot)microsoft.ml\2.0.0\build\netstandard2.0\Microsoft.ML.props" Condition="Exists('$(NuGetPackageRoot)microsoft.ml\2.0.0\build\netstandard2.0\Microsoft.ML.props')" />
     <Import Project="$(NuGetPackageRoot)lightgbm\2.3.1\build\LightGBM.props" Condition="Exists('$(NuGetPackageRoot)lightgbm\2.3.1\build\LightGBM.props')" />
   </ImportGroup>
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <PkgMicrosoft_Extensions_ApiDescription_Server Condition=" '$(PkgMicrosoft_Extensions_ApiDescription_Server)' == '' ">C:\Users\A\.nuget\packages\microsoft.extensions.apidescription.server\3.0.0</PkgMicrosoft_Extensions_ApiDescription_Server>
-    <PkgNewtonsoft_Json Condition=" '$(PkgNewtonsoft_Json)' == '' ">C:\Users\A\.nuget\packages\newtonsoft.json\10.0.3</PkgNewtonsoft_Json>
+    <PkgMicrosoft_Extensions_ApiDescription_Server Condition=" '$(PkgMicrosoft_Extensions_ApiDescription_Server)' == '' ">C:\Users\A\.nuget\packages\microsoft.extensions.apidescription.server\6.0.5</PkgMicrosoft_Extensions_ApiDescription_Server>
+    <PkgMicrosoft_ML_DnnImageFeaturizer_ResNet50 Condition=" '$(PkgMicrosoft_ML_DnnImageFeaturizer_ResNet50)' == '' ">C:\Users\A\.nuget\packages\microsoft.ml.dnnimagefeaturizer.resnet50\0.20.0</PkgMicrosoft_ML_DnnImageFeaturizer_ResNet50>
+    <PkgMicrosoft_ML_DnnImageFeaturizer_ResNet18 Condition=" '$(PkgMicrosoft_ML_DnnImageFeaturizer_ResNet18)' == '' ">C:\Users\A\.nuget\packages\microsoft.ml.dnnimagefeaturizer.resnet18\0.20.0</PkgMicrosoft_ML_DnnImageFeaturizer_ResNet18>
+    <PkgMicrosoft_ML_DnnImageFeaturizer_ResNet101 Condition=" '$(PkgMicrosoft_ML_DnnImageFeaturizer_ResNet101)' == '' ">C:\Users\A\.nuget\packages\microsoft.ml.dnnimagefeaturizer.resnet101\0.20.0</PkgMicrosoft_ML_DnnImageFeaturizer_ResNet101>
+    <PkgMicrosoft_ML_DnnImageFeaturizer_AlexNet Condition=" '$(PkgMicrosoft_ML_DnnImageFeaturizer_AlexNet)' == '' ">C:\Users\A\.nuget\packages\microsoft.ml.dnnimagefeaturizer.alexnet\0.20.0</PkgMicrosoft_ML_DnnImageFeaturizer_AlexNet>
+    <PkgMicrosoft_CodeAnalysis_Analyzers Condition=" '$(PkgMicrosoft_CodeAnalysis_Analyzers)' == '' ">C:\Users\A\.nuget\packages\microsoft.codeanalysis.analyzers\3.0.0</PkgMicrosoft_CodeAnalysis_Analyzers>
   </PropertyGroup>
 </Project>

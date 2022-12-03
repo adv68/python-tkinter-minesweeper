@@ -129,3 +129,4 @@ C:\Users\A\git\python-tkinter-minesweeper\ml.net\MinesweeperML.NET\obj\x64\Debug
 C:\Users\A\git\python-tkinter-minesweeper\ml.net\MinesweeperML.NET\obj\x64\Debug\net6.0\MinesweeperML.NET.pdb
 C:\Users\A\git\python-tkinter-minesweeper\ml.net\MinesweeperML.NET\obj\x64\Debug\net6.0\MinesweeperML.NET.genruntimeconfig.cache
 C:\Users\A\git\python-tkinter-minesweeper\ml.net\MinesweeperML.NET\obj\x64\Debug\net6.0\ref\MinesweeperML.NET.dll
+C:\Users\A\git\python-tkinter-minesweeper\ml.net\MinesweeperML.NET\bin\x64\Debug\net6.0\MLModel1.zip

@@ -1,6 +1,10 @@
 # Python Version 2.7.3
 # File: minesweeper.py
 
+# The minesweeper game was developed by ripexz (github.com/ripexz)
+# All additions for CIS 365 project are surrounded by comments and are commented
+# The rest remains as it was at the fork
+
 from tkinter import *
 from tkinter import messagebox as tkMessageBox
 from collections import deque
@@ -67,6 +71,7 @@ class Minesweeper:
 
 
         # ADDED SECTION
+        # set up bools for tracking game state
         self.gameEnded = False
         self.won = False
         # END ADDED SECTION
@@ -137,10 +142,11 @@ class Minesweeper:
 
 
         # ADDED SECTION
-
+        # set game end flags
         self.gameEnded = True
         self.won = won
 
+        # if no stop handler is registered, run the original end of game handler
         if self.stopHandler == None:
             # ORIGINAL END OF GAME CODE
             msg = "You Win! Play again?" if won else "You Lose! Play again?"
@@ -151,6 +157,7 @@ class Minesweeper:
                 self.tk.quit()
             # END ORIGINAL END CODE
         else:
+            # run the stop handler which returns a bool. if true quit, otherwise restart
             if self.stopHandler(won):
                 self.tk.quit()
             else:
@@ -274,6 +281,7 @@ class Minesweeper:
 
     # SECTION ADDED FOR AGENT
 
+    # return the current state of a given tile
     # -2 doesnt exist
     # -1 dont know
     # 0 clear
@@ -290,18 +298,20 @@ class Minesweeper:
                 return -1
         except KeyError:
             return -2
-        #return self.tiles[x][y]
 
+    # simulate a click on a tile (left click)
     def clickTile(self, x, y):
         t = self.tiles[x][y]
         t["button"].configure(bg = "#444444")
         self.onClick(t)
 
+    # simulate a tile flag (right click)
     def flagTile(self, x, y):
         t = self.tiles[x][y]
         t["button"].configure(bg = "#444444")
         self.onRightClick(t)
 
+    # register a stop handler for the game
     def setStopHandler(self, handler):
         self.stopHandler = handler
     # END SECTION ADDED FOR AGENT
@@ -316,13 +326,13 @@ def main():
     # create game instance
     minesweeper = Minesweeper(window)
 
-    # setup agent
+    # setup agent instance
     agent = Agent(minesweeper)
 
     # run event loop
     window.mainloop()
 
-    # stop agent
+    # stop agent thread before exit
     agent.stopThread()
 
 if __name__ == "__main__":
